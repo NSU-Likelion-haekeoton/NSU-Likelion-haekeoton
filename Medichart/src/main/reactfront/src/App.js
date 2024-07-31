@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout";
 import Layout from "./components/layout";
@@ -7,7 +8,8 @@ import AdminMonth from "./pages/AdminMonth";
 import AdminYear from "./pages/AdminYear";
 import AdminNoticeList from "./pages/AdminNoticeList";
 import AdminNoticeNew from "./pages/AdminNoticeNew";
-
+import { AuthProvider } from "./pages/AuthContext";
+import ProtectedRoute from "./pages/ProtectedRoute";
 import Korean from "./pages/korean";
 import Japanese from "./pages/Japanese";
 import Chinese from "./pages/Chinese";
@@ -16,13 +18,10 @@ import Signup from "./pages/signup";
 import Email from "./pages/email";
 import EmailVerification from "./pages/EmailVerification";
 import Mymedicheck from "./pages/mymedicheck";
-import ProtectedRoute from "./pages/ProtectedRoute";
-import { AuthProvider } from "./pages/AuthContext";
 import SearchHospital from "./pages/SearchHospital";
 import Mypage from "./pages/Mypage";
 import CustomerService from "./pages/CustomerService";
 import Prediction from "./pages/prediction";
-
 import NotFound from "./pages/NotFound";
 
 function App() {

@@ -1,6 +1,4 @@
-
 package com.example.medichart.login.service;
-
 
 import com.example.medichart.login.dto.UserDTO;
 import com.example.medichart.login.entity.UserEntity;
@@ -132,7 +130,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email);
     }
 
-    @Scheduled(fixedRate = 3600000) // 1시간에 한 번 실행 (밀리초 단위)
+    @Scheduled(fixedRate = 3600000)
     @Transactional
     public void removeUnverifiedUsers() {
         LocalDateTime cutoffDate = LocalDateTime.now().minusHours(3); // 3시간 기준
@@ -184,6 +182,10 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
 
         tokenRepository.delete(resetToken);
+    }
+
+    public List<UserEntity> getAllUsersSortedByCreatedAtDesc() {
+        return userRepository.findAllByOrderByCreatedAtDesc(); // 최신순으로 정렬된 사용자 목록 반환
     }
 
     public List<String> findEmailsByNameAndBirthdate(String name, Date birthdate) {

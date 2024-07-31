@@ -1,19 +1,19 @@
 import "../pages/login.css";
-import { Link } from "react-router-dom"; // Link 임포트 추가
+import { Link } from "react-router-dom";
 import kakaologo from "../kakaotalk_sharing_btn_small.png";
 import naverlogo from "../naverlogo.png";
 import googlelogo from "../btn_google.svg";
 
-import { useContext } from "react";
+import { useAuth } from "../pages/AuthContext"; // useAuth 훅 가져오기
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "./AuthContext";
 
 function Login() {
-    const { login } = useContext(AuthContext);
+    const { login } = useAuth(); // useAuth 훅 사용
     const navigate = useNavigate();
 
     const handleLogin = () => {
-        login();
+        // 이메일 로그인 기능을 구현해야 함
+        login(); // 사용자 ID를 넘겨줘야 함. 임시로 설정된 값 사용
         navigate("/");
     };
 
@@ -36,7 +36,7 @@ function Login() {
 
     const G_ClientID = process.env.REACT_APP_GOOGLE_KEY;
     const G_REDIRECT_URI = process.env.REACT_APP_GOOGLE_REDIRECT_URI;
-    const G_URL = ` https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${G_ClientID}&redirect_uri=${G_REDIRECT_URI}&scope=openid%20email%20profile`;
+    const G_URL = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${G_ClientID}&redirect_uri=${G_REDIRECT_URI}&scope=openid%20email%20profile`;
 
     const handlegoogleLogin = () => {
         window.location.href = G_URL;
@@ -45,33 +45,33 @@ function Login() {
     return (
         <div className="container">
             <h3>로그인</h3>
-            <p style={{ color: "red", margin: " 0 0 30px 9px" }}>
+            <p style={{ color: "red", margin: "0 0 30px 9px" }}>
                 로그인 후 이용해주세요
             </p>
-            <div className="loginForm ">
+            <div className="loginForm">
                 <input
                     type="email"
                     id="user_id"
                     placeholder="이메일을 입력하세요"
                     className="loginInput"
                     required
-                ></input>
+                />
                 <input
                     type="password"
                     id="user_password"
                     placeholder="비밀번호를 입력하세요"
                     className="loginInput"
                     required
-                ></input>
+                />
             </div>
 
-            <div className="loginForm_bottom ">
+            <div className="loginForm_bottom">
                 <input
                     onClick={handleLogin}
                     type="submit"
                     value="이메일로 로그인"
                     className="button"
-                ></input>
+                />
 
                 <div className="section_find">
                     <p
@@ -86,7 +86,7 @@ function Login() {
                             style={{ color: "black", fontSize: "16px" }}
                         >
                             회원가입
-                        </Link>
+                        </Link>{" "}
                     </p>
                     <p
                         style={{
@@ -99,9 +99,9 @@ function Login() {
                         SNS 로그인
                     </p>
                     <div className="SNS">
-                        <img onClick={handlenaverLogin} src={naverlogo} alt="Naver Login"></img>
-                        <img onClick={handlekakaoLogin} src={kakaologo} alt="Kakao Login"></img>
-                        <img onClick={handlegoogleLogin} src={googlelogo} alt="Google Login"></img>
+                        <img onClick={handlenaverLogin} src={naverlogo} alt="Naver login" />
+                        <img onClick={handlekakaoLogin} src={kakaologo} alt="Kakao login" />
+                        <img onClick={handlegoogleLogin} src={googlelogo} alt="Google login" />
                     </div>
                 </div>
             </div>

@@ -7,7 +7,7 @@ const AdminNoticeList = () => {
     const [notices, setNotices] = useState([]);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10); // Use this if needed
+    const [size, setSize] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
@@ -36,7 +36,7 @@ const AdminNoticeList = () => {
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        setPage(0); // Reset to first page on search
+        setPage(0); // 검색 시 첫 페이지로 이동
         fetchNotices();
     };
 
@@ -49,8 +49,11 @@ const AdminNoticeList = () => {
         }
     };
 
-    const pageSize = size;
-    const startIndex = page * pageSize;
+    const handlePageChange = (newPage) => {
+        if (newPage >= 0 && newPage < totalPages) {
+            setPage(newPage);
+        }
+    };
 
     return (
         <div className={styles.container}>
@@ -99,7 +102,7 @@ const AdminNoticeList = () => {
                     <tbody>
                     {notices.map((notice, index) => (
                         <tr key={notice.id}>
-                            <td>{startIndex + index + 1}</td>
+                            <td>{page * size + index + 1}</td>
                             <td>{notice.title}</td>
                             <td>{notice.content}</td>
                             <td>
@@ -116,15 +119,21 @@ const AdminNoticeList = () => {
                     </tbody>
                 </table>
                 <div className={styles.pagination}>
+                    <button onClick={() => handlePageChange(page - 1)} disabled={page === 0}>
+                        이전
+                    </button>
                     {[...Array(totalPages).keys()].map((num) => (
                         <button
                             key={num}
-                            onClick={() => setPage(num)}
+                            onClick={() => handlePageChange(num)}
                             disabled={num === page}
                         >
                             {num + 1}
                         </button>
                     ))}
+                    <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages - 1}>
+                        다음
+                    </button>
                 </div>
             </section>
         </div>

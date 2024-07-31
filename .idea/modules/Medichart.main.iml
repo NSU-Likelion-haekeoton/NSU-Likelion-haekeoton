@@ -5,7 +5,6 @@
       <sourceFolder url="file://$MODULE_DIR$/../../Medichart/build/generated/sources/annotationProcessor/java/main" isTestSource="false" generated="true" />
     </content>
 <<<<<<< HEAD
-=======
     <content url="file://$MODULE_DIR$/../../Medichart/src/main">
       <sourceFolder url="file://$MODULE_DIR$/../../Medichart/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../Medichart/src/main/resources" type="java-resource" />
@@ -190,6 +189,5 @@
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.javassist:javassist:3.29.0-GA" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.glassfish.jaxb:txw2:4.0.5" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.sun.istack:istack-commons-runtime:4.1.2" level="project" />
->>>>>>> f652071a52c72cd652f60cec71072572e713937f
   </component>
 </module>
