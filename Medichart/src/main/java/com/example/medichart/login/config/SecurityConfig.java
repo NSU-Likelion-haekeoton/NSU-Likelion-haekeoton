@@ -32,8 +32,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // CORS 설정 적용
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/register", "/verify-email", "/verify", "/forgotPassword", "/resetPassword", "/findEmails", "/login/**", "/oauth2/**", "/api/**", "/chatbot").permitAll() // 특정 요청 허용
-                                .anyRequest().authenticated() // 나머지 요청은 인증 필요
+                                .anyRequest().permitAll() // 모든 요청 허용
                 )
                 .csrf(csrf -> csrf
                         .disable()  // CSRF 보호 비활성화
@@ -44,14 +43,13 @@ public class SecurityConfig {
                 )
                 .logout(logout ->
                         logout
-                                .logoutSuccessUrl("/login?logout")
-                                .permitAll()
+                                .disable() // 로그아웃 비활성화
                 )
                 .oauth2Login(oauth2Login ->
                         oauth2Login
-                                .loginPage("/login")
                                 .userInfoEndpoint(userInfoEndpoint ->
                                         userInfoEndpoint.userService(customOAuth2UserService))
+                                .defaultSuccessUrl("/", true) // OAuth2 로그인 성공 후 리다이렉트 URL 설정
                 );
 
         return http.build();

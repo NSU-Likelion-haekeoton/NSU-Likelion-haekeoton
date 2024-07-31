@@ -1,55 +1,78 @@
 package com.example.medichart.admin.service;
 
+import com.example.medichart.login.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class UserStatisticsService {
 
-    private final List<Integer> signupCounts;
+    private final UserRepository userRepository;
 
-    public UserStatisticsService() {
-        signupCounts = generateRandomSignupCounts();
+    @Autowired
+    public UserStatisticsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public long getTodaySignupCount() {
-        return signupCounts.get(0); // 오늘 가입자 수
+        LocalDate today = LocalDate.now();
+        Date startOfDay = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date endOfDay = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return userRepository.countByCreatedAtBetween(startOfDay, endOfDay);
     }
 
     public List<Long> getLast7DaysSignupCounts() {
-        List<Long> last7DaysSignupCounts = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            last7DaysSignupCounts.add((long) signupCounts.get(i));
-        }
-        return last7DaysSignupCounts;
+        return getSignupCountsForDays(7);
     }
 
     public List<Long> getLast12MonthsSignupCounts() {
-        List<Long> last12MonthsSignupCounts = new ArrayList<>();
-        for (int i = 7; i < 19; i++) {
-            last12MonthsSignupCounts.add((long) signupCounts.get(i));
-        }
-        return last12MonthsSignupCounts;
+        return getSignupCountsForMonths(12);
     }
 
     public List<Long> getLast3YearsSignupCounts() {
-        List<Long> last3YearsSignupCounts = new ArrayList<>();
-        for (int i = 19; i < 22; i++) {
-            last3YearsSignupCounts.add((long) signupCounts.get(i));
-        }
-        return last3YearsSignupCounts;
+        return getSignupCountsForYears(3);
     }
 
-    // 테스트용 랜덤 가입자 수 생성
-    private List<Integer> generateRandomSignupCounts() {
-        List<Integer> counts = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < 22; i++) { // 0~21 인덱스에 데이터 생성
-            counts.add(random.nextInt(100)); // 0부터 99까지의 랜덤 숫자 생성
-        }
-        return counts;
+    private List<Long> getSignupCountsForDays(int days) {
+        LocalDate today = LocalDate.now();
+        return IntStream.range(0, days)
+                .mapToObj(i -> today.minusDays(i))
+                .map(date -> {
+                    Date startOfDay = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    Date endOfDay = Date.from(date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    return userRepository.countByCreatedAtBetween(startOfDay, endOfDay);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> getSignupCountsForMonths(int months) {
+        LocalDate today = LocalDate.now();
+        return IntStream.range(0, months)
+                .mapToObj(i -> today.minusMonths(i))
+                .map(date -> {
+                    Date startOfMonth = Date.from(date.withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    Date endOfMonth = Date.from(date.plusMonths(1).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    return userRepository.countByCreatedAtBetween(startOfMonth, endOfMonth);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> getSignupCountsForYears(int years) {
+        LocalDate today = LocalDate.now();
+        return IntStream.range(0, years)
+                .mapToObj(i -> today.minusYears(i))
+                .map(date -> {
+                    Date startOfYear = Date.from(date.withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    Date endOfYear = Date.from(date.plusYears(1).withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    return userRepository.countByCreatedAtBetween(startOfYear, endOfYear);
+                })
+                .collect(Collectors.toList());
     }
 }

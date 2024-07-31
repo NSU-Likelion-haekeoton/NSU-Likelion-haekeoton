@@ -93,18 +93,17 @@ const AdminNoticeList = () => {
                     <tr>
                         <th>번호</th>
                         <th>제목</th>
-                        <th>내용</th>
+                        <th>작성 일자</th>
                         <th>수정</th>
                         <th>삭제</th>
-                        <th>작성 일자</th>
                     </tr>
                     </thead>
                     <tbody>
                     {notices.map((notice, index) => (
                         <tr key={notice.id}>
-                            <td>{page * size + index + 1}</td>
+                            <td>{page * size + index + 1}</td> {/* 페이지 내 항목 번호 */}
                             <td>{notice.title}</td>
-                            <td>{notice.content}</td>
+                            <td>{new Date(notice.createdDate).toLocaleString()}</td>
                             <td>
                                 <Link to={`/admin/notice/edit/${notice.id}`}>
                                     <button>수정</button>
@@ -113,7 +112,6 @@ const AdminNoticeList = () => {
                             <td>
                                 <button onClick={() => handleDelete(notice.id)}>삭제</button>
                             </td>
-                            <td>{new Date(notice.createdDate).toLocaleString()}</td>
                         </tr>
                     ))}
                     </tbody>

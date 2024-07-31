@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+</head>
+<body>
+<div class="container mt-4">
+  <h1>Admin Dashboard</h1>
+
+  <!-- Today's Signup Count -->
+  <div class="card mb-4">
+    <div class="card-header">Today's Signup Count</div>
+    <div class="card-body">
+      <h2 id="today-signup-count">Loading...</h2>
+    </div>
+  </div>
+
+  <!-- Signup Counts Chart -->
+  <div class="card mb-4">
+    <div class="card-header">Signup Counts</div>
+    <div class="card-body">
+      <div id="signup-chart"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Fetch and display today's signup count
+  fetch('/admin/dashboard')
+          .then(response => response.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            document.getElementById('today-signup-count').innerText = doc.querySelector('[th\\:text="${오늘가입자수}"]').innerText;
+          });
+
+  // Fetch and render the signup counts chart
+  fetch('/admin/weekly-visitor-count')
+          .then(response => response.json())
+          .then(data => {
+            Highcharts.chart('signup-chart', {
+              chart: {
+                type: 'line'
+              },
+              title: {
+                text: 'Signup Counts'
+              },
+              xAxis: {
+                categories: ['Last 7 Days', 'Last 12 Months', 'Last 3 Years']
+              },
+              yAxis: {
+                title: {
+                  text: 'Signup Count'
+                }
+              },
+              series: [{
+                name: 'Signup Count',
+                data: [
+                  ...data
+                ]
+              }]
+            });
+          });
+</script>
+</body>
+</html>
