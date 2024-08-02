@@ -39,14 +39,13 @@ spring:
             client-name: Oauth2
             redirect-uri: http://localhost:8080/login/oauth2/code/kakao
             scope: profile_nickname
-
           naver:
+            client-name: naver
             client-id: J9e7ZObddUCfs_4uICkI
             client-secret: BGNHd8raRh
-            scope: profile,email
-            client-name: Naver
-            authorization-grant-type: authorization_code
             redirect-uri: http://localhost:8080/login/oauth2/code/naver
+            authorization-grant-type: authorization_code
+            scope: name,email
 
           google:
             client-id: 709796471451-hdg13q22jmbruh79om4k0vb4t4b2plmp.apps.googleusercontent.com

@@ -44,15 +44,17 @@ function Login() {
         window.location.href = kakaoURL;
     };
 
-    const N_clientID = "J9e7ZObddUCfs_4uICkI";
-    const N_REDIRECT_URI = "http://localhost:3000/login/oauth2/code/naver";
-    const stateString = process.env.REACT_APP_NAVER_STATE;
-    const NAVER_URL = `https://nid.naver.com/oauth2.0/authorize?client_id=${N_clientID}&response_type=code&redirect_uri=${encodeURIComponent(N_REDIRECT_URI)}&state=${stateString}`;
-
+    const N_CLIENT_ID =  "J9e7ZObddUCfs_4uICkI"; // 환경 변수에서 가져옴
+    const N_REDIRECT_URI = "http://localhost:8080/login/oauth2/code/naver"; // 환경 변수에서 가져옴
+    const stateString = generateRandomState(); // 랜덤 상태 생성 함수 사용
+    const NAVER_URL = `https://nid.naver.com/oauth2.0/authorize?client_id=${N_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(N_REDIRECT_URI)}&state=${stateString}`;
     const handlenaverLogin = () => {
         window.location.href = NAVER_URL;
     };
-
+    // 랜덤 상태 문자열 생성 함수
+    function generateRandomState() {
+        return Math.random().toString(36).substring(2);
+    }
     const G_ClientID = process.env.REACT_APP_GOOGLE_KEY;
     const G_REDIRECT_URI = process.env.REACT_APP_GOOGLE_REDIRECT_URI;
     const G_URL = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${G_ClientID}&redirect_uri=${encodeURIComponent(G_REDIRECT_URI)}&scope=openid%20email%20profile`;

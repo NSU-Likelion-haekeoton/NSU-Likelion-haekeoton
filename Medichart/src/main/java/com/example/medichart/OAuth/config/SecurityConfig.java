@@ -10,12 +10,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -26,7 +27,6 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil) {
-
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
         this.jwtUtil = jwtUtil;
@@ -35,63 +35,56 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+        // CORS 설정
         http
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()));
 
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-
-                        CorsConfiguration configuration = new CorsConfiguration();
-
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        configuration.setAllowedMethods(Collections.singletonList("*"));
-                        configuration.setAllowCredentials(true);
-                        configuration.setAllowedHeaders(Collections.singletonList("*"));
-                        configuration.setMaxAge(3600L);
-
-                        configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
-                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-
-                        return configuration;
-                    }
-                }));
-
-        //csrf disable
+        // CSRF 비활성화
         http
-                .csrf((auth) -> auth.disable());
+                .csrf(csrf -> csrf.disable());
 
-        //From 로그인 방식 disable
+        // 폼 로그인 비활성화
         http
-                .formLogin((auth) -> auth.disable());
+                .formLogin(form -> form.disable());
 
-        //HTTP Basic 인증 방식 disable
+        // HTTP Basic 인증 비활성화
         http
-                .httpBasic((auth) -> auth.disable());
+                .httpBasic(basic -> basic.disable());
 
-        //JWTFilter 추가
+        // JWT 필터 추가
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
-        //oauth2
+        // OAuth2 설정
         http
-                .oauth2Login((oauth2) -> oauth2
-                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
-                        .successHandler(customSuccessHandler)
-                );
+                        .successHandler(customSuccessHandler));
 
-        //경로별 인가 작업
+        // 경로별 인가 설정
         http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("my").hasRole("USER")
-                        .anyRequest().authenticated());
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/").permitAll() // 루트 경로는 모두 허용
+                        .requestMatchers("/profile/**").authenticated() // /profile 경로는 인증된 사용자만 허용
+                        .requestMatchers("/user").authenticated() // /user 경로는 인증된 사용자만 허용
+                        .anyRequest().denyAll()); // 기본적으로 모든 요청 거부
 
-        //세션 설정 : STATELESS
+        // 세션 설정 : STATELESS
         http
-                .sessionManagement((session) -> session
+                .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // 허용된 출처 설정
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용된 메서드 설정
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 허용된 헤더 설정
+        configuration.setAllowCredentials(true); // 자격 증명 허용
+        return request -> configuration;
     }
 }

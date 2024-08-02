@@ -1,55 +1,85 @@
 package com.example.medichart.admin.service;
 
+import com.example.medichart.OAuth.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class UserStatisticsService {
 
-    private final List<Integer> signupCounts;
+    private final UserRepository userRepository;
 
-    public UserStatisticsService() {
-        signupCounts = generateRandomSignupCounts();
+    @Autowired
+    public UserStatisticsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
+    // 오늘 가입한 사용자 수를 반환하는 메서드
     public long getTodaySignupCount() {
-        return signupCounts.get(0); // 오늘 가입자 수
+        LocalDate today = LocalDate.now(); // 현재 날짜를 얻음
+        Date startOfDay = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()); // 하루의 시작 시간
+        Date endOfDay = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()); // 하루의 끝 시간
+        return userRepository.countByCreatedAtBetween(startOfDay, endOfDay); // 주어진 기간 내에 생성된 사용자 수를 반환
     }
 
+    // 최근 7일 동안의 가입자 수를 리스트로 반환하는 메서드
     public List<Long> getLast7DaysSignupCounts() {
-        List<Long> last7DaysSignupCounts = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            last7DaysSignupCounts.add((long) signupCounts.get(i));
-        }
-        return last7DaysSignupCounts;
+        return getSignupCountsForDays(7); // 7일 동안의 데이터를 반환
     }
 
+    // 최근 12개월 동안의 가입자 수를 리스트로 반환하는 메서드
     public List<Long> getLast12MonthsSignupCounts() {
-        List<Long> last12MonthsSignupCounts = new ArrayList<>();
-        for (int i = 7; i < 19; i++) {
-            last12MonthsSignupCounts.add((long) signupCounts.get(i));
-        }
-        return last12MonthsSignupCounts;
+        return getSignupCountsForMonths(12); // 12개월 동안의 데이터를 반환
     }
 
+    // 최근 3년 동안의 가입자 수를 리스트로 반환하는 메서드
     public List<Long> getLast3YearsSignupCounts() {
-        List<Long> last3YearsSignupCounts = new ArrayList<>();
-        for (int i = 19; i < 22; i++) {
-            last3YearsSignupCounts.add((long) signupCounts.get(i));
-        }
-        return last3YearsSignupCounts;
+        return getSignupCountsForYears(3); // 3년 동안의 데이터를 반환
     }
 
-    // 테스트용 랜덤 가입자 수 생성
-    private List<Integer> generateRandomSignupCounts() {
-        List<Integer> counts = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < 22; i++) { // 0~21 인덱스에 데이터 생성
-            counts.add(random.nextInt(100)); // 0부터 99까지의 랜덤 숫자 생성
-        }
-        return counts;
+    // 주어진 일 수 동안의 가입자 수를 리스트로 반환하는 메서드
+    private List<Long> getSignupCountsForDays(int days) {
+        LocalDate today = LocalDate.now(); // 현재 날짜
+        return IntStream.range(0, days) // 0부터 days까지의 스트림 생성
+                .mapToObj(i -> today.minusDays(i)) // 각 날짜를 계산
+                .map(date -> {
+                    Date startOfDay = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()); // 하루의 시작 시간
+                    Date endOfDay = Date.from(date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()); // 하루의 끝 시간
+                    return userRepository.countByCreatedAtBetween(startOfDay, endOfDay); // 주어진 기간 동안의 가입자 수를 반환
+                })
+                .collect(Collectors.toList()); // 리스트로 수집
+    }
+
+    // 주어진 월 수 동안의 가입자 수를 리스트로 반환하는 메서드
+    private List<Long> getSignupCountsForMonths(int months) {
+        LocalDate today = LocalDate.now(); // 현재 날짜
+        return IntStream.range(0, months) // 0부터 months까지의 스트림 생성
+                .mapToObj(i -> today.minusMonths(i)) // 각 월을 계산
+                .map(date -> {
+                    Date startOfMonth = Date.from(date.withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant()); // 월의 시작 시간
+                    Date endOfMonth = Date.from(date.plusMonths(1).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant()); // 월의 끝 시간
+                    return userRepository.countByCreatedAtBetween(startOfMonth, endOfMonth); // 주어진 기간 동안의 가입자 수를 반환
+                })
+                .collect(Collectors.toList()); // 리스트로 수집
+    }
+
+    // 주어진 연 수 동안의 가입자 수를 리스트로 반환하는 메서드
+    private List<Long> getSignupCountsForYears(int years) {
+        LocalDate today = LocalDate.now(); // 현재 날짜
+        return IntStream.range(0, years) // 0부터 years까지의 스트림 생성
+                .mapToObj(i -> today.minusYears(i)) // 각 년을 계산
+                .map(date -> {
+                    Date startOfYear = Date.from(date.withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant()); // 년의 시작 시간
+                    Date endOfYear = Date.from(date.plusYears(1).withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant()); // 년의 끝 시간
+                    return userRepository.countByCreatedAtBetween(startOfYear, endOfYear); // 주어진 기간 동안의 가입자 수를 반환
+                })
+                .collect(Collectors.toList()); // 리스트로 수집
     }
 }

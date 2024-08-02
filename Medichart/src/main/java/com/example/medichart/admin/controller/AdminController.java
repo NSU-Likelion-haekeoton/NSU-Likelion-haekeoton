@@ -1,4 +1,4 @@
-/*
+
 package com.example.medichart.admin.controller;
 
 import com.example.medichart.admin.service.UserStatisticsService;
@@ -56,4 +56,4 @@ public class AdminController {
     public List<Long> getLast3YearsSignupCounts() {
         return userStatisticsService.getLast3YearsSignupCounts();
     }
-}*/
+}

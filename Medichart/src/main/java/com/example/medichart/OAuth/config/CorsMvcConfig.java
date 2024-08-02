@@ -8,10 +8,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsMvcConfig implements WebMvcConfigurer {
 
     @Override
-    public void addCorsMappings(CorsRegistry corsRegistry) {
-
-        corsRegistry.addMapping("/**")
-                .exposedHeaders("Set-Cookie")
-                .allowedOrigins("http://localhost:3000");
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/user/**") // WebSocket 엔드포인트 경로
+                .allowedOrigins("http://localhost:3000") // 허용된 출처 설정
+                .allowedMethods("GET", "POST") // 허용된 메서드 설정
+                .allowedHeaders("Authorization", "Content-Type") // 허용된 헤더 설정
+                .allowCredentials(true); // 자격 증명 허용
     }
 }

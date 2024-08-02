@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-<<<<<<< HEAD
-=======
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Medichart.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Medichart.main.iml" />
->>>>>>> 3f4f9053c680cd1b33293c489dc40f59592e661a
-      <module fileurl="file://$PROJECT_DIR$/.idea/NSU-Likelion-haekeoton.iml" filepath="$PROJECT_DIR$/.idea/NSU-Likelion-haekeoton.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/태현이.iml" filepath="$PROJECT_DIR$/.idea/태현이.iml" />
     </modules>
   </component>
 </project>

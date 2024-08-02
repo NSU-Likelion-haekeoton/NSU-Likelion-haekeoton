@@ -1,11 +1,10 @@
 package com.example.medichart.OAuth.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -22,4 +21,8 @@ public class UserEntity {
     private String email;
 
     private String role;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
 }
